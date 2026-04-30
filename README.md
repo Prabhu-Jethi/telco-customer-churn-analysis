@@ -26,13 +26,14 @@ at-risk customers before they leave.
 ## Model Performance
 - Accuracy  : 79.6%
 - Classification_Report:
-| | Precision | Recall | F1-Score | Support |
-|---|---|---|---|---|
-| Not Churned | 0.91 | 0.83 | 0.87 | 1142 |
-| Churned | 0.47 | 0.66 | 0.55 | 267 |
-| **Accuracy** | | | **0.80** | **1409** |
-| Macro Avg | 0.69 | 0.74 | 0.71 | 1409 |
-| Weighted Avg | 0.83 | 0.80 | 0.81 | 1409 |
+  
+- | | Precision | Recall | F1-Score | Support |
+- |---|---|---|---|---|
+- | Not Churned | 0.91 | 0.83 | 0.87 | 1142 |
+- | Churned | 0.47 | 0.66 | 0.55 | 267 |
+- | **Accuracy** | | | **0.80** | **1409** |
+- | Macro Avg | 0.69 | 0.74 | 0.71 | 1409 |
+- | Weighted Avg | 0.83 | 0.80 | 0.81 | 1409 |
 
 ## Tools Used
 Python, Pandas, Scikit-learn, Matplotlib, Seaborn

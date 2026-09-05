@@ -3,15 +3,15 @@ import pandas as pd
 import numpy as np
 
 RANDOM_SEED = 42
-DAYS = 180
+DAYS = 90
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
 INPUT_FILE = (BASE_DIR / "data" / "WA_Fn-UseC_-Telco-Customer-Churn.csv")
-OUTPUT_FILE = (BASE_DIR / "data" / "customer_behavior_logs.csv")
+OUTPUT_FILE = (BASE_DIR / "data" / "customer_logs.csv")
 
 
-def genrate_behavior_logs(customers: pd.DataFrame):
+def generate_behavior_logs(customers: pd.DataFrame):
     rng = np.random.default_rng(RANDOM_SEED)
     records = []
 
@@ -73,7 +73,7 @@ def genrate_behavior_logs(customers: pd.DataFrame):
 
 def main():
     customers = pd.read_csv(INPUT_FILE)
-    behavior_logs = genrate_behavior_logs(customers)
+    behavior_logs = generate_behavior_logs(customers)
 
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     behavior_logs.to_csv(OUTPUT_FILE, index=False)

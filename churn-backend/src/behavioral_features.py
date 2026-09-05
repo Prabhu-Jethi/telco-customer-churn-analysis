@@ -69,7 +69,7 @@ def create_behavioral_features(behavior: pd.DataFrame):
 
 if __name__ == "__main__":
 
-    input_file = "../data/customer_behavior_logs.csv"
+    input_file = "../data/customer_logs.csv"
     if os.path.exists(input_file):
         print(f"Reading {input_file}...")
         behavior_logs = pd.read_csv(input_file)
@@ -77,11 +77,9 @@ if __name__ == "__main__":
         print("Generating behavioral features...")
         behavioral_features = create_behavioral_features(behavior_logs)
         
-        print("Merging features back to the original logs...")
-        merged_logs = behavior_logs.merge(behavioral_features, on="customer_id", how="left")
-        
-        print(f"Saving merged data to {input_file}...")
-        merged_logs.to_csv(input_file, index=False)
+        output_file = "../data/behavioral_features.csv"
+        print(f"Saving behavioral features (1 row per customer) to {output_file}...")
+        behavioral_features.to_csv(output_file, index=False)
         print("Done!")
     else:
         print(f"File not found: {input_file}")

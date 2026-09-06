@@ -86,6 +86,33 @@ def generate_recommendations(customer_data, probability, drivers):
         })
 
     # -----------------------------
+    # Behavioral Features
+    # -----------------------------
+    usage_change = customer_data.get("usage_change_30d", 0)
+    if usage_change < 0:
+        recommendations.append({
+            "category": "Engagement",
+            "action": "Send a targeted re-engagement email or customized content.",
+            "reason": f"Customer's usage has dropped by {abs(usage_change):.1f}% over the last 30 days."
+        })
+
+    support_tickets = customer_data.get("support_tickets_30d", 0)
+    if support_tickets >= 3:
+        recommendations.append({
+            "category": "Support",
+            "action": "Route immediately to a premium white-glove technical support agent.",
+            "reason": f"Customer has filed {support_tickets} support tickets in the last month."
+        })
+
+    active_days = customer_data.get("active_days_30d", 30)
+    if active_days <= 10:
+        recommendations.append({
+            "category": "Retention",
+            "action": "Trigger a 'we miss you' discount campaign.",
+            "reason": f"Customer was only active for {active_days} out of the last 30 days."
+        })
+
+    # -----------------------------
     # High-risk escalation
     # -----------------------------
     if probability >= 0.70:

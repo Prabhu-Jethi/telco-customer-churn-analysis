@@ -23,6 +23,7 @@ def generate_behavior_logs(customers: pd.DataFrame):
         internet = customer["InternetService"]
 
         engagement_score = rng.normal(1.0, 0.15)
+        is_churner = (customer["Churn"] == "Yes")
 
         if contract == "Month-to-month":
             engagement_score *= 0.95
@@ -31,12 +32,29 @@ def generate_behavior_logs(customers: pd.DataFrame):
 
         if internet == "Fiber optic":
             engagement_score *= 1.02
+            
+        # Add realistic overlap: Only 60% of churners show reduced engagement
+        # and 10% of non-churners randomly have low engagement.
+        shows_churn_behavior = is_churner and rng.random() < 0.60
+        shows_vacation_behavior = not is_churner and rng.random() < 0.10
+
+        if shows_churn_behavior or shows_vacation_behavior:
+            engagement_score *= rng.uniform(0.5, 0.8) 
 
         base_login = max(1, 12 + (tenure * 0.03) + rng.normal(0, 1.5))
         base_usage = max(2, 25 + (monthly_charges * 0.12) + rng.normal(0, 3))
 
         for day in range(DAYS):
-            trend = 1 - (day / DAYS) * rng.uniform(0.00, 0.12)
+            if shows_churn_behavior:
+                # Gradual drop off, but with more noise
+                drop_factor = (day / DAYS) ** 1.5 
+                trend = max(0.1, 1 - drop_factor * rng.uniform(0.3, 0.7))
+            elif shows_vacation_behavior:
+                # Random mid-period dip
+                trend = max(0.2, 1 - rng.uniform(0.2, 0.5))
+            else:
+                # Normal users stay relatively stable
+                trend = 1 - (day / DAYS) * rng.uniform(0.00, 0.12)
 
             daily_noise = rng.normal(1.0, 0.12)
 

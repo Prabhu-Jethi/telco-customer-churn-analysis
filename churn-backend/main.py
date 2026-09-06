@@ -38,21 +38,21 @@ app.add_middleware(
 @app.post("/predict")
 def predict(customer: CustomerData):
 
+    customer_dict = customer.model_dump()
+    
     prediction, probability, drivers = predict_churn(
-        customer.model_dump()
+        customer_dict
     )
     
     if probability < 0.30:
         risk_level = 'low'
-
     elif probability < 0.60:
         risk_level = 'mid'
-
     else:
         risk_level = 'high'
 
     recommendations = generate_recommendations(
-        customer.model_dump(),
+        customer_dict,
         probability,
         drivers
     )

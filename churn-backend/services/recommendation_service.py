@@ -9,13 +9,13 @@ def generate_recommendations(customer_data, probability, drivers):
     # -----------------------------
     # Risk priority
     # -----------------------------
-    if probability >= 0.70:
+    if probability >= 0.60:
         priority = "Critical"
 
     elif probability >= 0.50:
         priority = "High"
 
-    elif probability >= 0.30:
+    elif probability >= 0.25:
         priority = "Medium"
 
     else:
@@ -115,7 +115,7 @@ def generate_recommendations(customer_data, probability, drivers):
     # -----------------------------
     # High-risk escalation
     # -----------------------------
-    if probability >= 0.70:
+    if probability >= 0.60:
         recommendations.insert(0, {
             "category": "Priority",
             "action": "Prioritize this customer for immediate retention outreach.",
@@ -132,7 +132,7 @@ def generate_recommendations(customer_data, probability, drivers):
     # -----------------------------
     # Low-risk customer
     # -----------------------------
-    if probability < 0.30:
+    if probability < 0.25:
         recommendations.append({
             "category": "Engagement",
             "action": "Continue normal customer engagement and monitor future risk.",

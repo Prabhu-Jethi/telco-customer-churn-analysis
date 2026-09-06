@@ -175,7 +175,7 @@ export default function Home() {
 
         setApiPrediction(result);
 
-        notify("Prediction updated from XGBoost.");
+        notify("Predicted...");
 
     } catch (error) {
         console.log("======== PREDICTION ERROR =======")

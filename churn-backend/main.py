@@ -44,10 +44,10 @@ def predict(customer: CustomerData):
         customer_dict
     )
     
-    if probability < 0.30:
+    if probability < 0.25:
         risk_level = 'low'
-    elif probability < 0.60:
-        risk_level = 'mid'
+    elif probability < 0.50:
+        risk_level = 'medium'
     else:
         risk_level = 'high'
 

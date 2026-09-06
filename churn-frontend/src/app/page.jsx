@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 
 const workflowData = [
   ["01 · Customer data","Start with the customer story.","Profile, tenure, contract and service attributes become the input to the prediction layer."],
-  ["02 · ML prediction","Turn customer attributes into risk.","The selected XGBoost model produces a probability score that can be consumed by the product layer."],
+  ["02 · ML prediction","Turn customer attributes into risk.","The selected Random Forest model produces a probability score that can be consumed by the product layer."],
   ["03 · SHAP analysis","Explain why the score changed.","Feature-level contributions surface the strongest risk drivers instead of leaving the prediction as a black box."],
   ["04 · Retention action","Convert risk into a next step.","Prioritize the customer and recommend an intervention based on the strongest signals."]
 ];
@@ -317,7 +317,7 @@ export default function Home() {
               </div>
               <div className="signal-card card-two">
                 <span>Model</span>
-                <b>XGBoost</b>
+                <b>Random Forest</b>
                 <small>ROC-AUC 0.90</small>
               </div>
               <div className="signal-card card-three">
@@ -333,7 +333,7 @@ export default function Home() {
           <span>BUILT FOR DATA-DRIVEN RETENTION</span>
           <div className="tech-list">
             <b>Python</b>
-            <b>XGBoost</b>
+            <b>Random Forest</b>
             <b>SHAP</b>
             <b>FastAPI</b>
             <b>Next.js</b>
@@ -405,7 +405,7 @@ export default function Home() {
                 <span className="dot" />
               </div>
               <strong>90%</strong>
-              <p>ROC-AUC achieved by the selected XGBoost model.</p>
+              <p>ROC-AUC achieved by the selected model.</p>
               <div className="metric-line">
                 <span />
               </div>
@@ -441,7 +441,7 @@ export default function Home() {
                     {
                       [
                         "Profile + services",
-                        "XGBoost inference",
+                        "RandomForest inference",
                         "Why the score changed",
                         "Prioritized response",
                       ][i]
@@ -596,7 +596,7 @@ export default function Home() {
                       <div className="shap-box">
                         <div className="box-head">
                           <b>Why this customer is at risk</b>
-                          <span>SHAP · XGBoost</span>
+                          <span>SHAP · Random Forest</span>
                         </div>
                         {apiPrediction?.drivers?.length ? (
                           apiPrediction.drivers.map((driver, index) => (
@@ -698,7 +698,7 @@ export default function Home() {
                     {apiPrediction?.drivers?.length ? (
                       <>
                         <p>
-                          The XGBoost model identified the following features as
+                          The model identified the following features as
                           the strongest contributors to this customer's
                           prediction.
                         </p>

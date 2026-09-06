@@ -118,7 +118,7 @@ BINARY_MAPPINGS = {
 def preprocess_input(customer_data):
     """
     Convert raw customer data into the exact feature
-    representation expected by the trained XGBoost model.
+    representation expected by the trained model.
 
     Parameters
     ----------

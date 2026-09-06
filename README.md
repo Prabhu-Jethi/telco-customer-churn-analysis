@@ -1,6 +1,6 @@
 # ChurnIQ — Customer Churn Prediction & Retention Intelligence Platform
 
-> An end-to-end, explainable customer churn intelligence platform that predicts customer churn risk, explains the key drivers behind each prediction, and converts model outputs into actionable retention recommendations.
+> An end-to-end, explainable customer churn intelligence platform that predicts customer churn risk, explains the key drivers behind each prediction, and converts model outputs into actionable, behavior-driven retention recommendations.
 
 **Live Application:** https://churniq-analysis-next.onrender.com
 <br><br/>
@@ -27,22 +27,22 @@ A traditional churn model may provide only a probability score. That is often in
 **ChurnIQ connects all three stages into a single workflow:**
 
 ```text
-Customer Data
-      │
-      ▼
-Preprocessing
-      │
-      ▼
-XGBoost Churn Prediction
-      │
-      ▼
-SHAP Explainability
-      │
-      ▼
-Retention Recommendation
-      │
-      ▼
-Interactive ChurnIQ Interface
+Customer Data + Behavioral Logs
+              │
+              ▼
+        Preprocessing
+              │
+              ▼
+ Random Forest Churn Prediction
+              │
+              ▼
+     SHAP Explainability
+              │
+              ▼
+  Retention Recommendation
+              │
+              ▼
+ Interactive ChurnIQ Interface
 ```
 
 The result is a decision-support application rather than just a machine-learning model.
@@ -51,11 +51,11 @@ The result is a decision-support application rather than just a machine-learning
 
 # 🎯 Business Problem
 
-Telecom companies lose customers for many different reasons, including contract type, tenure, pricing, service configuration, and customer support experience.
+Telecom companies lose customers for many different reasons, including contract type, tenure, pricing, service configuration, and recent customer support experience.
 
 The objective of this project is to identify customers with a high probability of churn early enough for a business to take preventive action.
 
-The model is trained using the IBM Telco Customer Churn dataset containing **7,043 customers** and customer/service attributes.
+The model is trained using the IBM Telco Customer Churn dataset combined with **simulated 90-day behavioral logs** (e.g., login frequency, support tickets, usage drop-offs) across **7,043 customers**. 
 
 The project prioritizes **recall** because missing an actual churner can be more costly to the business than contacting a customer who ultimately stays.
 
@@ -67,9 +67,9 @@ ChurnIQ provides an end-to-end ML workflow:
 
 ### 1. Predict
 
-The system accepts customer profile and service information and sends it to a FastAPI backend.
+The system accepts a customer demographic profile, automatically queries the database for their latest **behavioral telemetry**, and sends the combined 39-feature payload to a FastAPI backend. 
 
-The backend preprocesses the data and generates a churn probability using the trained XGBoost model.
+The backend preprocesses the data and generates a churn probability using a highly-optimized **Random Forest** model.
 
 ### 2. Explain
 
@@ -84,65 +84,65 @@ Churn probability: 76%
 the system can explain:
 
 ```text
-Month-to-month contract      → increases risk
-Short tenure                 → increases risk
-Higher monthly charges       → increases risk
+Usage dropped by 15% in 30 days → increases risk
+Filed 4 support tickets           → increases risk
+Month-to-month contract           → increases risk
 ```
 
 ### 3. Act
 
-The strongest risk signals are converted into retention recommendations so that the prediction can support an actual business response.
+The strongest risk signals are converted into behavior-driven retention recommendations. If a customer is churning due to high support tickets, the system recommends white-glove technical support rather than a blanket monetary discount.
 
 ---
 
 # 🧠 Machine Learning Pipeline
 
 ```text
-Raw Customer Data
-        │
-        ▼
-Data Cleaning
-        │
-        ├── Handle missing TotalCharges
-        ├── Convert numeric fields
-        └── Encode categorical features
-        │
-        ▼
-Feature Engineering
-        │
-        ├── Label Encoding
-        └── One-Hot Encoding
-        │
-        ▼
-Train/Test Split
-        │
-        ▼
-SMOTE
-        │
-        ▼
-StandardScaler
-        │
-        ▼
-Model Comparison
-        │
-        ├── Logistic Regression
-        ├── Random Forest
-        └── XGBoost
-        │
-        ▼
-Best Model: XGBoost
-        │
-        ▼
-SHAP Tree Explainer
-        │
-        ▼
-Prediction + Explanation
-        │
-        ▼
-Retention Recommendation
+  Demographics + Behavioral Logs
+              │
+              ▼
+        Data Cleaning
+              │
+              ├── Handle missing TotalCharges
+              ├── Convert numeric fields
+              └── Encode categorical features
+              │
+              ▼
+      Feature Engineering
+              │
+              ├── Label Encoding
+              └── One-Hot Encoding
+              │
+              ▼
+       Train/Test Split
+              │
+              ▼
+            SMOTE
+              │
+              ▼
+        StandardScaler
+              │
+              ▼
+       Model Comparison
+              │
+              ├── Logistic Regression
+              ├── Random Forest
+              └── XGBoost
+              │
+              ▼
+   Best Model: Random Forest
+              │
+              ▼
+      SHAP Tree Explainer
+              │
+              ▼
+   Prediction + Explanation
+              │
+              ▼
+   Retention Recommendation
 ```
 
-SMOTE is applied to the training data to address the class imbalance, while scaling is fitted on training data and then applied to the test data. The original project also compares Logistic Regression, Random Forest and XGBoost before selecting XGBoost as the strongest model.
+SMOTE is applied to the training data to address the class imbalance, while scaling is fitted on training data and then applied to the test data. The project compares Logistic Regression, Random Forest and XGBoost before selecting Random Forest as the strongest model (ROC-AUC: 0.923).
 
 ---
 
@@ -150,21 +150,11 @@ SMOTE is applied to the training data to address the class imbalance, while scal
 
 | Model               | Precision |   Recall | F1-Score |  ROC-AUC |
 | ------------------- | --------: | -------: | -------: | -------: |
-| Logistic Regression |      0.62 |     0.79 |     0.69 |     0.84 |
-| Random Forest       |      0.65 |     0.81 |     0.72 |     0.88 |
-| **XGBoost**         |  **0.68** | **0.85** | **0.75** | **0.90** |
+| XGBoost             |      0.79 |     0.71 |     0.75 |     0.911|
+| Logistic Regression |      0.79 |     0.70 |     0.74 |     0.919|
+| **Random Forest**   |  **0.81** | **0.70** | **0.75** | **0.923**|
 
-The XGBoost model achieves approximately **0.90 ROC-AUC** with **85% churn recall**, making it the selected production model.
-
-### Why Recall?
-
-The dataset has a significant class imbalance. Optimizing only for accuracy could hide poor churn detection performance.
-
-The project therefore emphasizes:
-
-**Recall → F1 → ROC-AUC**
-
-rather than relying on accuracy alone.
+The Random Forest model achieved the strongest combination of Precision and ROC-AUC (**0.923**) after the inclusion of the 13 new behavioral features, making it the selected production model.
 
 ---
 
@@ -181,13 +171,9 @@ The explanation layer allows users to understand:
 
 Important churn signals identified in the project include:
 
-* Contract type
-* Tenure
-* Monthly charges
-* Technical support
-* Internet service
-
-The original analysis also identifies contract type and tenure among the strongest churn drivers.
+* **Behavioral Activity**: Usage drop-offs, platform abandonment (active days), and login frequency.
+* **Friction Metrics**: The number of support tickets filed in the last 30/90 days and resolution times.
+* **Financial/Contractual**: Contract type, tenure, and monthly charges.
 
 ---
 
@@ -202,7 +188,7 @@ The frontend is built as a modern interactive web application rather than a note
 * Churn probability visualization
 * Low / Medium / High risk classification
 * SHAP driver visualization
-* Retention recommendations
+* Behavior-driven retention recommendations
 * Prediction workspace
 * Explainability view
 * Analytics view
@@ -228,6 +214,7 @@ POST /predict
 
 ```json
 {
+  "customerID": "7043-ABCD",
   "gender": "Female",
   "SeniorCitizen": 0,
   "Partner": "No",
@@ -255,16 +242,31 @@ POST /predict
 ```json
 {
   "prediction": 1,
-  "churn_probability": 0.76,
-  "churn_percentage": 76.0,
+  "churn_probability": 0.8234,
+  "churn_percentage": 82.34,
   "risk_level": "high",
-  "model": "XGBoost",
-  "drivers": [],
-  "recommendations": {}
+  "model": "Random Forest",
+  "drivers": [
+    {
+      "feature": "Usage trend (%)",
+      "display_name": "Usage trend (%)",
+      "impact": 0.1543,
+      "direction": "increases_risk",
+      "importance": "Medium"
+    }
+  ],
+  "recommendations": {
+    "priority": "Critical",
+    "actions": [
+      {
+        "category": "Engagement",
+        "action": "Send a targeted re-engagement email or customized content.",
+        "reason": "Customer's usage has dropped by 15.0% over the last 30 days."
+      }
+    ]
+  }
 }
 ```
-
-The exact SHAP driver and recommendation contents depend on the customer profile being evaluated.
 
 ---
 
@@ -281,10 +283,14 @@ The exact SHAP driver and recommendation contents depend on the customer profile
              │ HTTPS / REST API            │
              └──────────────► /predict ───┤
                                            │
+                                    Data Injection
+                                     (Logs Fetch)
+                                           │
+                                           ▼
                                     Preprocessing
                                            │
                                            ▼
-                                      XGBoost Model
+                                 Random Forest Model
                                            │
                                            ▼
                                         SHAP
@@ -319,7 +325,7 @@ Both the frontend and backend are containerized.
           │                         │
           └────────── API ──────────┘
                      │
-              XGBoost + SHAP
+            Random Forest + SHAP
 ```
 
 ### Backend container
@@ -329,8 +335,8 @@ Contains:
 * FastAPI
 * Python dependencies
 * preprocessing pipeline
-* trained XGBoost model
-* SHAP
+* trained Random Forest model
+* SHAP explainer
 * recommendation logic
 
 ### Frontend container
@@ -358,42 +364,6 @@ Backend
 https://churniq-fastapi-server.onrender.com
 ```
 
-### Production request flow
-
-```text
-User
- │
- ▼
-ChurnIQ Frontend
- │
- │ POST /predict
- ▼
-FastAPI Backend
- │
- ▼
-XGBoost
- │
- ▼
-SHAP
- │
- ▼
-Recommendation Engine
- │
- ▼
-Prediction JSON
- │
- ▼
-ChurnIQ UI
-```
-
-The frontend uses the production API URL through:
-
-```text
-NEXT_PUBLIC_API_URL
-```
-
-rather than hardcoding a local `localhost` API address.
-
 ---
 
 # 🧰 Tech Stack
@@ -401,7 +371,7 @@ rather than hardcoding a local `localhost` API address.
 | Category         | Technology                                  |
 | ---------------- | ------------------------------------------- |
 | Programming      | Python, JavaScript                          |
-| Machine Learning | XGBoost, Random Forest, Logistic Regression |
+| Machine Learning | Random Forest, XGBoost, Logistic Regression |
 | Data Processing  | pandas, NumPy                               |
 | ML Pipeline      | scikit-learn, imbalanced-learn              |
 | Imbalanced Data  | SMOTE                                       |
@@ -412,10 +382,7 @@ rather than hardcoding a local `localhost` API address.
 | Styling          | CSS                                         |
 | Serialization    | joblib                                      |
 | Containerization | Docker                                      |
-| Version Control  | Git, GitHub                                 |
 | Deployment       | Render                                      |
-
-The original repository already contains the underlying Python ML stack, SHAP, Streamlit application, and persisted-model workflow; the project has since been extended into the separate FastAPI + Next.js architecture documented above.
 
 ---
 
@@ -425,24 +392,38 @@ The original repository already contains the underlying Python ML stack, SHAP, S
 Customer-Churn-analysis/
 │
 ├── churn-backend/
+│   ├── data/
+│   │   ├── WA_Fn-UseC_-Telco-Customer-Churn.csv
+│   │   ├── customer_logs.csv
+│   │   └── master_training_data.csv
+│   │
 │   ├── models/
-│   │   └── trained model artifacts
+│   │   ├── churn_model.pkl
+│   │   ├── scaler.pkl
+│   │   └── feature_columns.pkl
 │   │
 │   ├── schemas/
 │   │   └── prediction.py
 │   │
 │   ├── services/
 │   │   ├── prediction_services.py
-│   │   └── recommendation_service.py
+│   │   ├── recommendation_service.py
+│   │   └── feature_service.py
+│   │
+│   ├── simulation/
+│   │   └── customer_behavior.py
 │   │
 │   ├── src/
-│   │   └── preprocessing.py
+│   │   ├── preprocessing.py
+│   │   └── behavioral_features.py
+│   │
+│   ├── training/
+│   │   └── train_churn_model.py
 │   │
 │   ├── .dockerignore
 │   ├── Dockerfile
 │   ├── main.py
-│   ├── requirements.txt
-│   └── test_preprocessing.py
+│   └── requirements.txt
 │
 ├── churn-frontend/
 │   ├── src/
@@ -456,10 +437,7 @@ Customer-Churn-analysis/
 │   ├── package.json
 │   └── package-lock.json
 │
-├── data/
 ├── notebooks/
-├── apps/
-├── src/
 ├── LICENSE
 └── README.md
 ```
@@ -532,130 +510,25 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 ---
 
-# 🐳 Running with Docker
+# � Key Engineering Decisions
 
-## Backend
+### Dynamic Behavioral Log Injection
+Instead of forcing the frontend to compute telemetry, the FastAPI backend dynamically reads `customerID`, queries the latest behavior logs from the database layer, and joins the arrays immediately before model execution.
 
-```bash
-cd churn-backend
+### Random Forest over XGBoost
+After synthesizing 90-day behavioral telemetry logs with the original demographics, the Random Forest model outperformed XGBoost in both ROC-AUC (0.923 vs 0.911) and precision, leading to its selection as the production model.
 
-docker build -t churn-backend .
+### Behavior-Driven Recommendations
+Standard churn predictors output generic financial solutions. This pipeline reads the raw SHAP driver arrays, identifies if churn is primarily driven by usage drop-off or excessive support tickets, and dynamically routes the customer to the appropriate mitigation flow (e.g. white-glove support).
 
-docker run -d \
-  -p 8000:8000 \
-  --name churn-backend-container \
-  churn-backend
-```
-
-## Frontend
-
-```bash
-cd churn-frontend
-
-docker build -t churn-frontend .
-
-docker run -d \
-  -p 3000:3000 \
-  --name churn-frontend-container \
-  churn-frontend
-```
-
-Then open:
-
-```text
-http://localhost:3000
-```
-
----
-
-# 🧪 Testing
-
-The final application can be tested using different customer profiles:
-
-| Test Case                   | Variables                                      |
-| --------------------------- | ---------------------------------------------- |
-| High-risk profile           | Short tenure + monthly contract                |
-| Long-term customer          | High tenure + two-year contract                |
-| High-charge customer        | Higher monthly charges                         |
-| Contract comparison         | Monthly vs one-year vs two-year                |
-| Service comparison          | Different InternetService/service combinations |
-| Customer profile comparison | Male/Female + different service configurations |
-
-The important validation is that the frontend sends the changed customer information to the backend and displays the resulting model response, SHAP drivers, and recommendation.
-
----
-
-# 🔑 Key Engineering Decisions
-
-### SMOTE after train/test split
-
-SMOTE is applied only to the training data to avoid synthetic samples leaking into the test set.
-
-### XGBoost over Random Forest
-
-XGBoost achieved the strongest ROC-AUC and churn recall among the evaluated models.
-
-### SHAP instead of a black-box score
-
-The model prediction is accompanied by feature-level explanations so users can understand the reasoning behind individual predictions.
-
-### FastAPI for model serving
-
-The trained model and preprocessing pipeline are separated from the frontend and exposed through a REST API.
-
-### Next.js for the application layer
-
-The frontend consumes backend responses and provides an interactive interface for business-oriented risk assessment.
-
-### Docker for reproducibility
-
-Both services are containerized so their runtime dependencies are isolated and deployment is consistent across environments.
-
-### Environment-based API configuration
-
-The frontend uses `NEXT_PUBLIC_API_URL` so the same code can communicate with the local FastAPI server during development and the deployed backend in production.
-
----
-
-# 📌 What This Project Demonstrates
-
-ChurnIQ demonstrates experience across the complete machine-learning application lifecycle:
-
-```text
-Data
- ↓
-EDA
- ↓
-Preprocessing
- ↓
-Class Imbalance Handling
- ↓
-Model Training
- ↓
-Model Evaluation
- ↓
-Explainable AI
- ↓
-REST API
- ↓
-Frontend Application
- ↓
-Docker
- ↓
-Cloud Deployment
-```
-
-This makes the project more than a standalone ML notebook: it demonstrates how a trained model can be transformed into a usable, explainable, deployable application.
+### Clean Architecture
+The final implementation migrated away from monolithic notebooks into a clean enterprise microservice architecture (`services/`, `training/`, `models/`, `simulation/`), ensuring robust isolation of offline pipelines and live serving layers.
 
 ---
 
 # 📊 Original Dataset
 
-**IBM Telco Customer Churn Dataset**
-
-* 7,043 customers
-* Telecom customer/service attributes
-* Binary churn target
+**IBM Telco Customer Churn Dataset** combined with **Simulated Behavioral Telemetry**.
 
 Dataset source:
 

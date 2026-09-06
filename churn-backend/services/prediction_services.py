@@ -2,11 +2,12 @@ import sys
 import joblib
 import shap
 from pathlib import Path
-sys.path.append(r"D:\Python\Churn_predictor\src")
-from src.preprocessing import preprocess_input
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-MODEL_PATH = BASE_DIR/"models"/"xgb_model.pkl"
+sys.path.append(str(BASE_DIR))
+from src.preprocessing import preprocess_input
+from services.feature_service import get_customer_features
+
+MODEL_PATH = BASE_DIR/"models"/"model.pkl"
 SCALER_PATH = BASE_DIR/"models"/"scaler.pkl"
 FEATURES_PATH = BASE_DIR/"models"/"feature_columns.pkl"
 
@@ -53,7 +54,21 @@ def format_shap_feature(feature, impact):
             "StreamingMovies": "Streaming movies",
             "PaperlessBilling": "Paperless billing",
             "MonthlyCharges": "Monthly charges",
-            "TotalCharges": "Total charges"
+            "TotalCharges": "Total charges",
+            # Behavioral Features
+            "login_count_30d": "Logins (30 days)",
+            "session_minutes_30d": "Session minutes (30 days)",
+            "feature_usage_30d": "Feature usage (30 days)",
+            "support_tickets_30d": "Support tickets (30 days)",
+            "resolution_hours_30d": "Ticket resolution hours (30 days)",
+            "active_days_30d": "Active days (30 days)",
+            "usage_change_30d": "Usage trend (%)",
+            "login_count_90d": "Logins (90 days)",
+            "session_minutes_90d": "Session minutes (90 days)",
+            "feature_usage_90d": "Feature usage (90 days)",
+            "support_tickets_90d": "Support tickets (90 days)",
+            "resolution_hours_90d": "Ticket resolution hours (90 days)",
+            "active_days_90d": "Active days (90 days)"
         }
 
         display_name = display_names.get(
@@ -85,20 +100,30 @@ def format_shap_feature(feature, impact):
     }
     
 def predict_churn(customer_data):
+    # Fetch behavioral data and merge it in!
+    customer_id = customer_data.get("customerID")
+    if customer_id:
+        behavioral_features = get_customer_features(customer_id)
+        if behavioral_features:
+            behavioral_features.pop("customerID", None)
+            customer_data.update(behavioral_features)
+            
     X = preprocess_input(customer_data)
 
     probability = float(
-        model.predict_proba(X)[0][1]
+        model.predict_proba(X.values)[0][1]
     )
 
     prediction = int(
-        model.predict(X)[0]
+        model.predict(X.values)[0]
     )
 
     shap_values = explainer.shap_values(X)
 
     if isinstance(shap_values, list):
         values = shap_values[1][0]
+    elif len(getattr(shap_values, 'shape', [])) == 3:
+        values = shap_values[0, :, 1]
     else:
         values = shap_values[0]
     

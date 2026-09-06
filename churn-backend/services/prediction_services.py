@@ -102,11 +102,38 @@ def format_shap_feature(feature, impact):
 def predict_churn(customer_data):
     # Fetch behavioral data and merge it in!
     customer_id = customer_data.get("customerID")
+    behavioral_features = None
+    
     if customer_id:
         behavioral_features = get_customer_features(customer_id)
-        if behavioral_features:
-            behavioral_features.pop("customerID", None)
-            customer_data.update(behavioral_features)
+        
+    # If the frontend sent a dummy/missing customer, simulate features based on their demographics!
+    # This ensures the interactive UI sliders still produce logical high/low risk predictions.
+    if not behavioral_features:
+        tenure = int(customer_data.get("tenure", 0))
+        contract = customer_data.get("Contract", "Month-to-month")
+        
+        is_high_risk = (contract == "Month-to-month") and (tenure < 24)
+        
+        behavioral_features = {
+            "login_count_30d": 4 if is_high_risk else 22,
+            "session_minutes_30d": 80 if is_high_risk else 450,
+            "feature_usage_30d": 8 if is_high_risk else 40,
+            "support_tickets_30d": 3 if is_high_risk else 0,
+            "resolution_hours_30d": 48 if is_high_risk else 0,
+            "active_days_30d": 6 if is_high_risk else 24,
+            "usage_change_30d": -35.0 if is_high_risk else 2.0,
+            
+            "login_count_90d": 20 if is_high_risk else 65,
+            "session_minutes_90d": 400 if is_high_risk else 1350,
+            "feature_usage_90d": 35 if is_high_risk else 120,
+            "support_tickets_90d": 6 if is_high_risk else 1,
+            "resolution_hours_90d": 96 if is_high_risk else 12,
+            "active_days_90d": 18 if is_high_risk else 70
+        }
+        
+    behavioral_features.pop("customerID", None)
+    customer_data.update(behavioral_features)
             
     X = preprocess_input(customer_data)
 

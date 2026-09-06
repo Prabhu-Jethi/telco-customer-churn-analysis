@@ -62,7 +62,7 @@ def predict(customer: CustomerData):
         "churn_probability": round(probability, 4),
         "churn_percentage": round(probability * 100, 2),
         "risk_level": risk_level,
-        "model": "XGBoost",
+        "model": "Random Forest",
         "drivers": drivers,
         "recommendations": recommendations
     }

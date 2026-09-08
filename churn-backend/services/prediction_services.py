@@ -113,24 +113,35 @@ def predict_churn(customer_data):
         tenure = int(customer_data.get("tenure", 0))
         contract = customer_data.get("Contract", "Month-to-month")
         
-        is_high_risk = (contract == "Month-to-month") and (tenure < 24)
-        
-        behavioral_features = {
-            "login_count_30d": 2 if is_high_risk else 22,
-            "session_minutes_30d": 25 if is_high_risk else 450,
-            "feature_usage_30d": 2 if is_high_risk else 40,
-            "support_tickets_30d": 7 if is_high_risk else 0,
-            "resolution_hours_30d": 96 if is_high_risk else 0,
-            "active_days_30d": 2 if is_high_risk else 24,
-            "usage_change_30d": -85.0 if is_high_risk else 2.0,
+        # Create a 3-tier risk system for a balanced frontend experience
+        if contract == "Month-to-month" and tenure <= 12:
+            risk_tier = "high"
+        elif contract == "Month-to-month" or (contract == "One year" and tenure < 24):
+            risk_tier = "medium"
+        else:
+            risk_tier = "low"
             
-            "login_count_90d": 15 if is_high_risk else 65,
-            "session_minutes_90d": 180 if is_high_risk else 1350,
-            "feature_usage_90d": 10 if is_high_risk else 120,
-            "support_tickets_90d": 12 if is_high_risk else 1,
-            "resolution_hours_90d": 160 if is_high_risk else 12,
-            "active_days_90d": 8 if is_high_risk else 70
-        }
+        if risk_tier == "high":
+            behavioral_features = {
+                "login_count_30d": 2, "session_minutes_30d": 25, "feature_usage_30d": 2,
+                "support_tickets_30d": 7, "resolution_hours_30d": 96, "active_days_30d": 2, "usage_change_30d": -85.0,
+                "login_count_90d": 15, "session_minutes_90d": 180, "feature_usage_90d": 10,
+                "support_tickets_90d": 12, "resolution_hours_90d": 160, "active_days_90d": 8
+            }
+        elif risk_tier == "medium":
+            behavioral_features = {
+                "login_count_30d": 12, "session_minutes_30d": 180, "feature_usage_30d": 15,
+                "support_tickets_30d": 2, "resolution_hours_30d": 24, "active_days_30d": 14, "usage_change_30d": -15.0,
+                "login_count_90d": 40, "session_minutes_90d": 600, "feature_usage_90d": 50,
+                "support_tickets_90d": 4, "resolution_hours_90d": 48, "active_days_90d": 40
+            }
+        else:
+            behavioral_features = {
+                "login_count_30d": 22, "session_minutes_30d": 450, "feature_usage_30d": 40,
+                "support_tickets_30d": 0, "resolution_hours_30d": 0, "active_days_30d": 24, "usage_change_30d": 2.0,
+                "login_count_90d": 65, "session_minutes_90d": 1350, "feature_usage_90d": 120,
+                "support_tickets_90d": 1, "resolution_hours_90d": 12, "active_days_90d": 70
+            }
         
     behavioral_features.pop("customerID", None)
     customer_data.update(behavioral_features)

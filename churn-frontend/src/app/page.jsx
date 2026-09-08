@@ -288,11 +288,11 @@ export default function Home() {
             </div>
             <div className="hero-proof">
               <div>
-                <strong>0.90</strong>
+                <strong>0.92</strong>
                 <span>ROC-AUC</span>
               </div>
               <div>
-                <strong>85%</strong>
+                <strong>94%</strong>
                 <span>Churn recall</span>
               </div>
               <div>
@@ -318,7 +318,7 @@ export default function Home() {
               <div className="signal-card card-two">
                 <span>Model</span>
                 <b>Random Forest</b>
-                <small>ROC-AUC 0.90</small>
+                <small>ROC-AUC 0.92</small>
               </div>
               <div className="signal-card card-three">
                 <span>Top driver</span>
@@ -404,7 +404,7 @@ export default function Home() {
                 <span>Model performance</span>
                 <span className="dot" />
               </div>
-              <strong>90%</strong>
+              <strong>92.3%</strong>
               <p>ROC-AUC achieved by the selected model.</p>
               <div className="metric-line">
                 <span />

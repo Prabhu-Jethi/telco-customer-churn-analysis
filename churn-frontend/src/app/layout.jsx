@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import { DM_Sans, Manrope } from "next/font/google";
 import "./globals.css";
 
@@ -22,7 +23,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${manrope.variable}`}>
-      <body>{children}</body>
+      <body>{children} <Analytics/> </body>
     </html>
   );
 }

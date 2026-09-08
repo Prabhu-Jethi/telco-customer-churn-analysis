@@ -2,7 +2,7 @@
 
 > An end-to-end, explainable customer churn intelligence platform that predicts customer churn risk, explains the key drivers behind each prediction, and converts model outputs into actionable retention recommendations.
 
-**Live Application:** https://churniq-analysis-next.onrender.com
+** Live Application --> https://churniq-next.vercel.app
 <br><br/>
 
 
